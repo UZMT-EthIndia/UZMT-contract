@@ -9,9 +9,7 @@ contract GameItemNFT is ERC4907Scholarship {
         string memory _name,
         string memory _symbol,
         address revenueTokenAddress
-    ) ERC4907Scholarship(_name, _symbol, revenueTokenAddress) {
-        // _safeMint(msg.sender, 1); // TODO: 이거 배포안됨
-    }
+    ) ERC4907Scholarship(_name, _symbol, revenueTokenAddress) {}
 
     function _baseURI() internal pure override returns (string memory) {
         return "https://test.p2e-game.com";
