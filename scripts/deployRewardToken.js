@@ -1,5 +1,7 @@
 // This is a script for deploying your contracts. You can adapt it to deploy
 // yours, or create new ones.
+
+
 async function main() {
     // This is just a convenience check
     // if (network.name === "hardhat") {
@@ -12,7 +14,7 @@ async function main() {
 
     // ethers is available in the global scope
     const [deployer] = await ethers.getSigners();
-    console.log('>>>>> Signers list: ', await ethers.getSigners());
+    // console.log('>>>>> Signers list: ', await ethers.getSigners());
     console.log(
         "Deploying the contracts with the account:",
         await deployer.getAddress()
@@ -21,12 +23,13 @@ async function main() {
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
     // Token Contract
-    const TokenContract = await ethers.getContractFactory("SampleERC20");
+    const TokenContract = await ethers.getContractFactory("GameRewardToken");
 
     // Token instance
     const Token = await TokenContract.deploy(
-        "GameToken",
-        "GAME"
+        "Mining King Gem",
+        "GEM",
+        10000  // DECIMAL == 18
     );
     console.log('>>> Deployment in progress...')
     await Token.deployed();

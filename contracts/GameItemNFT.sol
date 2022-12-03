@@ -15,7 +15,12 @@ contract GameItemNFT is ERC4907Scholarship {
         return "https://test.p2e-game.com";
     }
 
-    function safeMint(address to, uint256 tokenId) public onlyOwner {
+    function safeMint(
+        address to,
+        uint256 tokenId,
+        string memory tokenURI
+    ) public onlyOwner {
         _safeMint(to, tokenId);
+        _setTokenURI(tokenId, tokenURI);
     }
 }

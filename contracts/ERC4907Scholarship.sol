@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract ERC4907Scholarship is ERC4907, Ownable {
     IERC20 _token; // address of a token for the representation of the revenue.
 
-    mapping(uint256 => uint256) internal _shareRatios;
+    mapping(uint256 => uint256) internal _shareRatios; // tokenId => shareRatio (in bp; 1/10000)
 
     event DistributeRevenue(
         uint256 tokenId,
@@ -77,15 +77,21 @@ contract ERC4907Scholarship is ERC4907, Ownable {
      * Revenue sharing ratio in bp(1/10000) between the NFT Owner and the User.
      * if (sharing ratio = 20%), the User receives 20% of the total revenue earned by the NFT.
      */
-    function _getShareRatio(uint256 tokenId) internal view returns (uint256) {
+    function getShareRatio(uint256 tokenId) public view returns (uint256) {
         return _shareRatios[tokenId]; // TODO: temporary
     }
 
     function distributeRevenue(
         uint256 tokenId,
-        uint256 revenueTokenAmount // TODO: check decimals processing
-    ) public returns (bool) {
-        uint256 shareRatio = _getShareRatio(tokenId);
+        uint256 revenueTokenAmount
+    )
+        public
+        returns (
+            // ) public onlyOwner returns (bool) {
+            bool
+        )
+    {
+        uint256 shareRatio = getShareRatio(tokenId);
         // if invalid user
         if (userOf(tokenId) == address(0) || shareRatio == 0) {
             _token.transfer(ownerOf(tokenId), revenueTokenAmount);
@@ -98,11 +104,11 @@ contract ERC4907Scholarship is ERC4907, Ownable {
             );
             return true;
         }
-        uint256 tokenAmountForOwner = (10000 * revenueTokenAmount) / shareRatio; // shareRatio never be zero at this point.
+        uint256 tokenAmountForOwner = (shareRatio * revenueTokenAmount) / 10000; // shareRatio never be zero at this point.
         uint256 tokenAmountForUser = revenueTokenAmount - tokenAmountForOwner;
 
         _token.transfer(ownerOf(tokenId), tokenAmountForOwner); // send token from `msg.sender`
-        _token.transfer(ownerOf(tokenId), tokenAmountForUser);
+        _token.transfer(userOf(tokenId), tokenAmountForUser);
 
         emit DistributeRevenue(
             tokenId,

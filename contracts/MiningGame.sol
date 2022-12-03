@@ -1,26 +1,29 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.11;
 
-// Import thirdweb contracts
+// Import Token contracts
 // import "@thirdweb-dev/contracts/drop/DropERC1155.sol"; // For my collection of Pickaxes
-import "@thirdweb-dev/contracts/token/TokenERC20.sol"; // For my ERC-20 Token contract
-import "@thirdweb-dev/contracts/openzeppelin-presets/utils/ERC1155/ERC1155Holder.sol";
+// import "@thirdweb-dev/contracts/token/TokenERC20.sol"; // For my ERC-20 Token contract
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+// import "@thirdweb-dev/contracts/openzeppelin-presets/utils/ERC1155/ERC1155Holder.sol";
 
 // OpenZeppelin (ReentrancyGuard)
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 // Import GameItemNFT
-import {GameItemNFT} from "./GameItemNFT.sol";
+// import {GameItemNFT} from "./GameItemNFT.sol";
+import "./ERC4907Scholarship.sol";
 
-contract Mining is ReentrancyGuard, ERC1155Holder {
+// contract Mining is ReentrancyGuard, ERC1155Holder {
+contract MiningGame is ReentrancyGuard {
     // Store our two other contracts here (Edition Drop and Token)
-    GameItemNFT public immutable pickaxeNftCollection;
-    TokenERC20 public immutable rewardsToken;
+    ERC4907Scholarship public immutable pickaxeNftCollection;
+    ERC20 public immutable rewardsToken;
 
     // Constructor function to set the rewards token and the NFT collection addresses
     constructor(
-        GameItemNFT pickaxeContractAddress,
-        TokenERC20 gemsContractAddress
+        ERC4907Scholarship pickaxeContractAddress,
+        ERC20 gemsContractAddress
     ) {
         pickaxeNftCollection = pickaxeContractAddress;
         rewardsToken = gemsContractAddress;
@@ -44,7 +47,8 @@ contract Mining is ReentrancyGuard, ERC1155Holder {
     function stake(uint256 _tokenId) external nonReentrant {
         // Ensure the player has at least 1 of the token they are trying to stake
         require(
-            pickaxeNftCollection.ownerOf(_tokenId) == msg.sender,
+            pickaxeNftCollection.ownerOf(_tokenId) == msg.sender ||
+                pickaxeNftCollection.userOf(_tokenId) == msg.sender,
             "You must have at least 1 of the pickaxe you are trying to stake"
         );
 
@@ -60,7 +64,10 @@ contract Mining is ReentrancyGuard, ERC1155Holder {
 
         // Calculate the rewards they are owed, and pay them out.
         uint256 reward = calculateRewards(msg.sender);
-        rewardsToken.transfer(msg.sender, reward);
+        pickaxeNftCollection.distributeRevenue(
+            playerPickaxe[msg.sender].value,
+            reward
+        );
 
         // Transfer the pickaxe to the contract
         pickaxeNftCollection.safeTransferFrom(
@@ -87,7 +94,10 @@ contract Mining is ReentrancyGuard, ERC1155Holder {
 
         // Calculate the rewards they are owed, and pay them out.
         uint256 reward = calculateRewards(msg.sender);
-        rewardsToken.transfer(msg.sender, reward);
+        pickaxeNftCollection.distributeRevenue(
+            playerPickaxe[msg.sender].value,
+            reward
+        );
 
         // Send the pickaxe back to the player
         pickaxeNftCollection.safeTransferFrom(
@@ -139,10 +149,16 @@ contract Mining is ReentrancyGuard, ERC1155Holder {
 
         // Calculate the rewards they are owed
         uint256 rewards = timeDifference *
-            10_000_000_000_000 *
+            10_000_000_000_000_000 *
             (playerPickaxe[_player].value + 1);
 
         // Return the rewards
         return rewards;
+    }
+
+    function getPlayerPickaxe(
+        address _player
+    ) public view returns (MapValue memory) {
+        return playerPickaxe[_player];
     }
 }

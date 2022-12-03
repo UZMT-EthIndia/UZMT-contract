@@ -14,7 +14,7 @@ async function main() {
 
     // ethers is available in the global scope
     const [deployer] = await ethers.getSigners();
-    console.log('>>>>> Signers list: ', await ethers.getSigners());
+    // console.log('>>>>> Signers list: ', await ethers.getSigners());
     console.log(
         "Deploying the contracts with the account:",
         await deployer.getAddress()
@@ -22,19 +22,20 @@ async function main() {
 
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
-    // Token Contract
-    const TokenContract = await ethers.getContractFactory("GameRevenueToken");
+    // Mining Game Contract
+    const MiningContract = await ethers.getContractFactory("MiningGame");
 
-    // Token instance
-    const Token = await TokenContract.deploy(
-        "GameRevenueToken",
-        "RVN",
-        1500  // DECIMAL == 18
+    // Mining Game instance
+    const Mining = await MiningContract.deploy(
+        "0x6C6034dcb78891874133CB0FdB243D0e3cA7e767", // NFT | mumbai
+        "0xC1721ffBa6740BbFcda835b0A2379e5B43Abe006", // ERC20 | mumbai
+        // "0xe088b366ee6f76f807cD05E95DE686130b56A461", // NFT | cronos
+        // "0x9F1e198F4Ec190B65F330148342b5Ba9E6E324BE" // ERC20 | cronos
     );
     console.log('>>> Deployment in progress...')
-    await Token.deployed();
+    await Mining.deployed();
 
-    console.log("Deployed Token address:", Token.address);
+    console.log("Deployed Mining contract address:", Mining.address);
 
     // We also save the contract's artifacts and address in the frontend directory
     // saveFrontendFiles(token);

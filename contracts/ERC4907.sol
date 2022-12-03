@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "./interfaces/IERC4907.sol";
 
-contract ERC4907 is ERC721, IERC4907 {
+contract ERC4907 is ERC721URIStorage, IERC4907 {
     struct UserInfo {
         address user; // address of user role
         uint64 expires; // unix timestamp, user expires
@@ -27,10 +27,10 @@ contract ERC4907 is ERC721, IERC4907 {
         address user,
         uint64 expires
     ) public virtual {
-        require(
-            _isApprovedOrOwner(msg.sender, tokenId),
-            "ERC721: transfer caller is not owner nor approved"
-        );
+        // require(
+        //     _isApprovedOrOwner(msg.sender, tokenId),
+        //     "ERC721: transfer caller is not owner nor approved"
+        // );
         UserInfo storage info = _users[tokenId];
         info.user = user;
         info.expires = expires;

@@ -14,7 +14,7 @@ async function main() {
 
     // ethers is available in the global scope
     const [deployer] = await ethers.getSigners();
-    console.log('>>>>> Signers list: ', await ethers.getSigners());
+    // console.log('>>>>> Signers list: ', await ethers.getSigners());
     console.log(
         "Deploying the contracts with the account:",
         await deployer.getAddress()
@@ -27,9 +27,10 @@ async function main() {
 
     // Token instance
     const Token = await TokenContract.deploy(
-        "GameItemNFT",
-        "ITEM",
-        "0xC693456266FFfeA845fC5A3636f2FDDB2276F96e"
+        "pickAxe NFT",
+        "AXE",
+        "0xC1721ffBa6740BbFcda835b0A2379e5B43Abe006" // mumbai
+        // "0x9F1e198F4Ec190B65F330148342b5Ba9E6E324BE" // cronos
     );
     console.log('>>> Deployment in progress...')
     await Token.deployed();
